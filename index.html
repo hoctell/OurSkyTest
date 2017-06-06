@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel=stylesheet type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
+<style>
+  [v-cloak] {
+    display: none;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    font-family: OpenSans;
+    font-size: 24px;
+    background: #6CADFF;
+    min-height: 100vh;
+  }
+
+  input {
+    border: 0;
+    border-bottom: 2px solid #FFFFFF;
+    background: initial;
+    color: #FFFFFF;
+    outline: none;
+  }
+  button {
+    border: 0;
+    background: none;
+    outline: none;
+  }
+
+  .icon {
+    width: 56px;
+    height: 56px;
+    margin: 20px;
+  }
+
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header {
+    background: #6CADFF;
+    color: #FFFFFF;
+    margin: 65px auto;
+  }
+
+  #input-task-name {
+    width: 700px;
+    margin: 60px auto;
+  }
+
+  #container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    flex-direction: column;
+  }
+
+  .task {
+    display: flex;
+    align-items: center;
+    width: 818px;
+    height: 96px;
+    padding: 44px 20px;
+    margin: 15px;
+    background: #F8F8F8;
+    border: 1px solid #E7E7E7;
+    box-shadow: 0px 3px 0px 0px rgba(0,0,0,0.05);
+  }
+  .task.complete {
+    background: #E7E7E7;
+  }
+  .task > .name {
+    flex-grow: 1;
+    color: #888888;
+  }
+  .task.complete > .name {
+    color: #D9D9D9;
+  }
+  .task > .time {
+    color: #D9D9D9;
+  }
+</style>
+</head>
+<body>
+  <div class="header flex-center">
+    <div style="display: flex;align-items: center">
+      <img style="width: 47px; height: 55px; margin: 0px 20px;" src="Group.png"/>
+      <div>TASK TIMER</div>
+    </div>
+  </div>
+
+  <div id="container">
+    <div>
+      <input type="text" id="input-task-name" placeholder="Enter task name"
+        v-model="newTaskName"
+        v-on:keyup.enter="addTask"/>
+      <button class="icon" v-on:click="addTask"><img src="Group 3.png"/></button>
+    </div>
+    <div>
+      <div class="task" v-for="(task, index) in tasks"
+        :class="{ complete: task.isComplete }">
+        <div class="name">{{task.name}}</div>
+        <div class="time">{{showTime(task.time)}}</div>
+        <div v-show="!task.isComplete">
+          <button class="icon" v-on:click="stopTask(index)">
+            <img v-show="!task.isStop" src="Group 5.png"/>
+            <img v-show="task.isStop" src="Group 3.png"/>
+          </button>
+          <button class="icon" v-on:click="completeTask(index)">
+            <img src="Group 6.png"/>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/vue"></script>
+<script>
+  var vm = new Vue({
+    el: '#container',
+    data: {
+      newTaskName: '',
+      tasks: [],
+      timer: ''
+    },
+    created: function() {
+      this.timer = setInterval(this.addTime, 1000);
+    },
+    methods: {
+      showTime: function(time) {
+        var hour = Math.floor(time / 3600);
+        var min = Math.floor((time - (hour*3600) ) / 60);
+        var sec = time - (hour*3600) - (min*60);
+        var result = hour > 0 ? hour + ' hr ' : '';
+        result += min > 0 ? min + ' min ' : '';
+        return result + sec + ' sec';
+      },
+      addTime: function() {
+        this.tasks.forEach(function(task) {
+          if (!task.isComplete && !task.isStop)
+            task.time += 1;
+        })
+      },
+      addTask: function() {
+        var task = {
+          name: this.newTaskName,
+          time: 0,
+          isStop: false,
+          isComplete: false
+        };
+        this.tasks.push(task);
+        this.newTaskName = '';
+      },
+      stopTask: function(index) {
+        this.tasks[index].isStop = !this.tasks[index].isStop;
+      },
+      completeTask: function(index) {
+        this.tasks[index].isComplete = true;
+      }
+    }
+  });
+</script>
+</body>
+</html>
